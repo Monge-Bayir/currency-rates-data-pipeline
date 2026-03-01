@@ -1,0 +1,17 @@
+# data outputs
+data/raw/
+data/processed/
+data/analytics/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# mac
+.DS_Store
+
+# logs
+logs/
+*.log
