@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 PATH_NAME = "/opt/project/data/analytics"
 os.makedirs(PATH_NAME, exist_ok=True)
 
-def analytics_check(processed_path: str):
+def analytics_check(processed_path: str, run_date: str):
     if not os.path.exists(processed_path):
         logging.warning("Такого файла не существует")
         return
@@ -28,7 +28,7 @@ def analytics_check(processed_path: str):
         logging.warning("Нет данных для агрегации")
         return
 
-    date = records[0]["rate_date"]
+    date = run_date
     avg = sum(r["value_per_1"] for r in records) / len(records)
 
     # 1) среднее значение
@@ -51,8 +51,10 @@ def analytics_check(processed_path: str):
 
     logging.info("Аналитический слой выполнен")
 
+    return path_avg_name, path_top_name
+
 if __name__ == "__main__":
     from datetime import datetime
     today = datetime.now().strftime("%Y-%m-%d")
     processed_path = f"/opt/project/data/processed/processed_data_{today}.csv"
-    analytics_check(processed_path)
+    analytics_check(processed_path, today)

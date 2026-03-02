@@ -1,6 +1,6 @@
 import requests
 import logging
-import datetime
+from datetime import datetime
 import os
 
 
@@ -10,7 +10,7 @@ URL = 'https://www.cbr-xml-daily.ru/daily_json.js'
 RAW_DIR = "/opt/project/data/raw"
 os.makedirs(RAW_DIR, exist_ok=True)
 
-def extract_bank():
+def extract_bank(run_date: str):
     try:
         response = requests.get(URL, timeout=30)
         response.raise_for_status() #начинает работать, если запрос успешный
@@ -18,7 +18,7 @@ def extract_bank():
         logging.error('Connection error from extract')
         return
 
-    path_name = f"{RAW_DIR}/raw_bank_{datetime.datetime.now().strftime('%Y-%m-%d')}.json"
+    path_name = f"{RAW_DIR}/raw_bank_{run_date}.json"
     if not os.path.exists(path_name):
         with open(path_name, 'w', encoding='utf-8') as f:
             f.write(response.text)
@@ -30,4 +30,5 @@ def extract_bank():
 
 
 if __name__ == '__main__':
-    extract_bank()
+    today = datetime.now().strftime("%Y-%m-%d")
+    extract_bank(today)

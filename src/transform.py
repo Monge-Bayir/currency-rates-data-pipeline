@@ -10,8 +10,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 PROC_DIR = "/opt/project/data/processed"
 os.makedirs(PROC_DIR, exist_ok=True)
 
-def transform_bank(raw_path: str) -> Optional[str]:
-    path_name = f"{PROC_DIR}/processed_data_{datetime.now().strftime('%Y-%m-%d')}.csv"
+def transform_bank(raw_path: str, run_date: str) -> Optional[str]:
+    path_name = f"{PROC_DIR}/processed_data_{run_date}.csv"
 
     # идемпотентность: если уже есть — просто вернём
     if os.path.exists(path_name):
@@ -77,5 +77,5 @@ if __name__ == "__main__":
     from datetime import datetime
     today = datetime.now().strftime("%Y-%m-%d")
     raw_path = f"/opt/project/data/raw/raw_bank_{today}.json"
-    out = transform_bank(raw_path)
+    out = transform_bank(raw_path, today)
     print(out or "")
