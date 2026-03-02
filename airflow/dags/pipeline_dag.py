@@ -24,9 +24,19 @@ with DAG(
         bash_command=f'python3 {PROJECT_DIR}/src/transform.py'
     )
 
+    migrate = BashOperator(
+        task_id='migrate_schema',
+        bash_command=f'python3 {PROJECT_DIR}/src/migrate.py'
+    )
+
+    load = BashOperator(
+        task_id='load_to_postgres',
+        bash_command=f'python3 {PROJECT_DIR}/src/load.py'
+    )
+
     analytics = BashOperator(
         task_id='analytics',
         bash_command=f'python3 {PROJECT_DIR}/src/analytics.py'
     )
 
-    extract >> transform >> analytics
+    extract >> transform >> migrate >> load >> analytics

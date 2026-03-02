@@ -48,6 +48,11 @@ def cbr_pipeline_taskflow():
         return processed_path
 
     @task(retries=2)
+    def migrate() -> int:
+        from src.migrate import run_migrations
+        return run_migrations(conn_id="rates_pg")
+
+    @task(retries=2)
     def load_to_postgres(processed_path: str):
         from src.load import load_fact_rates
         ds = get_current_context()['ds']
@@ -67,6 +72,7 @@ def cbr_pipeline_taskflow():
     raw_path = extract()
     processed_path = transform(raw_path)
     checked_path = check_data_from_transform(processed_path)
+    migrate()
     load_to_postgres(checked_path)
     analytics(checked_path)
 
