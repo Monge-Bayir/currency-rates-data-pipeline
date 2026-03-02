@@ -1,11 +1,7 @@
 from datetime import datetime
-from time import clock_settime_ns
-
 from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
 import csv
-
-from sqlalchemy.testing import rowset
 
 
 @dag(
@@ -42,7 +38,7 @@ def cbr_pipeline_taskflow():
             reader = csv.DictReader(file)
             rows = list(reader)
 
-        if len(rows) <= 50:
+        if len(rows) < 50:
             raise ValueError(f'Слишком мало данных, их {rows}')
 
         for row in rows:
@@ -50,6 +46,15 @@ def cbr_pipeline_taskflow():
                 raise ValueError("value_per_1 <= 0")
 
         return processed_path
+
+    @task(retries=2)
+    def load_to_postgres(processed_path: str):
+        from src.load import load_fact_rates
+        ds = get_current_context()['ds']
+        out = load_fact_rates(processed_path, ds)
+        if not out:
+            raise ValueError(f"load_fact_rates вернул пустой результат для processed_path={processed_path}")
+        return out
 
     @task(retries=2)
     def analytics(processed_path: str) -> None:
@@ -62,6 +67,7 @@ def cbr_pipeline_taskflow():
     raw_path = extract()
     processed_path = transform(raw_path)
     checked_path = check_data_from_transform(processed_path)
+    load_to_postgres(checked_path)
     analytics(checked_path)
 
 cbr_pipeline_taskflow()
