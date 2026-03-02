@@ -7,7 +7,7 @@ from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-PROC_DIR = "data/processed"
+PROC_DIR = "/opt/project/data/processed"
 os.makedirs(PROC_DIR, exist_ok=True)
 
 def transform_bank(raw_path: str) -> Optional[str]:
@@ -72,3 +72,10 @@ def transform_bank(raw_path: str) -> Optional[str]:
 
     logging.info(f"Processed записан: {path_name} (rows={len(records)})")
     return path_name
+
+if __name__ == "__main__":
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
+    raw_path = f"/opt/project/data/raw/raw_bank_{today}.json"
+    out = transform_bank(raw_path)
+    print(out or "")

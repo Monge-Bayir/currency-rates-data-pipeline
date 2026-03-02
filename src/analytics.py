@@ -3,9 +3,10 @@ import os
 import csv
 import datetime
 
+
 logging.basicConfig(level=logging.INFO)
 
-PATH_NAME = "data/analytics"
+PATH_NAME = "/opt/project/data/analytics"
 os.makedirs(PATH_NAME, exist_ok=True)
 
 def analytics_check(processed_path: str):
@@ -49,3 +50,9 @@ def analytics_check(processed_path: str):
                 writer.writerow({"name": r["name"], "value_per_1": r["value_per_1"]})
 
     logging.info("Аналитический слой выполнен")
+
+if __name__ == "__main__":
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
+    processed_path = f"/opt/project/data/processed/processed_data_{today}.csv"
+    analytics_check(processed_path)

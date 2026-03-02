@@ -7,7 +7,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 URL = 'https://www.cbr-xml-daily.ru/daily_json.js'
-RAW_DIR = 'data/raw'
+RAW_DIR = "/opt/project/data/raw"
 os.makedirs(RAW_DIR, exist_ok=True)
 
 def extract_bank():
@@ -29,5 +29,5 @@ def extract_bank():
     return path_name
 
 
-
-
+if __name__ == '__main__':
+    extract_bank()
