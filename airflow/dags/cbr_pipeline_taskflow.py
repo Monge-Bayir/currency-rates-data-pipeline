@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from airflow.cli.commands.provider_command import hooks_list
 from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
 import csv
@@ -69,11 +71,29 @@ def cbr_pipeline_taskflow():
         if not out:
             raise ValueError(f"analytics_check вернул пустой результат для processed_path={processed_path}")
 
+    @task(retries=2)
+    def build_datamart():
+        from airflow.providers.postgres.hooks.postgres import PostgresHook
+
+        hook = PostgresHook(postgres_conn_id='rates_pg')
+
+        for path in [
+            '/opt/project/sql/05_datamart.sql',
+            '/opt/project/sql/06_top_rates.sql'
+        ]:
+            with open(path, 'r', encoding='utf-8') as file:
+                sql = file.read()
+            hook.run(sql)
+
+
+
+
     raw_path = extract()
     processed_path = transform(raw_path)
     checked_path = check_data_from_transform(processed_path)
     migrate()
     load_to_postgres(checked_path)
+    build_datamart()
     analytics(checked_path)
 
 cbr_pipeline_taskflow()
